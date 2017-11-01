@@ -8,161 +8,194 @@ Servo yaw_ser;
 //初始化及自检过程
 void setup()
 {
-    pitch_ser.attach(5);
-    yaw_ser.attach(6);
-    pinMode(A0,INPUT);
-    pinMode(A1,INPUT);
-    pinMode(A2,INPUT);
-    pinMode(A3,INPUT);
-    Serial.begin(9600);
+  pitch_ser.attach(5);
+  yaw_ser.attach(6);
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
+  pinMode(A2, INPUT);
+  pinMode(A3, INPUT);
+  Serial.begin(9600);
 
-    //伺服电机自检过程
+  //伺服电机自检过程
 
-    int pitch_angle;
-    int yaw_angle;
+  int pitch_angle;
+  int yaw_angle;
 
-    //pitch轴伺服电机自检
-    for(pitch_angle = 0;pitch_angle < 180; pitch_angle++)
-    {
-        pitch_ser.write(pitch_angle);
-        delay(3);
-    }
-    pitch_ser.write(90);
-    delay(100);
-
-    //yaw轴伺服电机自检
-    for(yaw_angle = 0;yaw_angle < 180; yaw_angle++)
-    {
-        yaw_ser.write(yaw_angle);
-        delay(3);
-    }
-    yaw_ser.write(90);
-    delay(100);
-
-
-    //双轴联动自检
-    pitch_angle = 0;
-    yaw_angle = 0;
+  //pitch轴伺服电机自检
+  for (pitch_angle = 90; pitch_angle < 180; pitch_angle++)
+  {
     pitch_ser.write(pitch_angle);
-    yaw_ser.wiret(yaw_angle);
-    delay(200);
+    delay(5);
+  }
+  delay(100);
+  for (pitch_angle = 179; pitch_angle > 0; pitch_angle--)
+  {
+    pitch_ser.write(pitch_angle);
+    delay(5);
+  }
+  delay(100);
+  for (pitch_angle = 1; pitch_angle < 91; pitch_angle++)
+  {
+    pitch_ser.write(pitch_angle);
+    delay(5);
+  }
+  delay(100);
+
+  //yaw轴伺服电机自检
+  for (yaw_angle = 90; yaw_angle < 180; yaw_angle++)
+  {
+    yaw_ser.write(yaw_angle);
+    delay(5);
+  }
+  delay(100);
+  for (yaw_angle = 179; yaw_angle > 0; yaw_angle--)
+  {
+    yaw_ser.write(yaw_angle);
+    delay(5);
+  }
+  delay(100);
+  for (yaw_angle = 1; yaw_angle < 91; yaw_angle++)
+  {
+    yaw_ser.write(yaw_angle);
+    delay(5);
+  }
+  delay(100);
 
 
+  //双轴联动自检
 
-    //正向转动自检
-    for(pitch_angle = 0,yaw_angle = 0;pitch_angle < 180 && yaw_angle <180; pitch_angle++,yaw_angle ++)
-    {
-        pitch_ser.write(pitch_angle);
-        yaw_ser.write(yaw_angle);
-        delay(3);
-    }
 
-    //逆向转动自检
-    for(pitch_angle = 180,yaw_angle = 180;pitch_angle > 0  && yaw_angle > 0; pitch_angle--,yaw_angle --)
-    {
-        pitch_ser.write(pitch_angle);
-        yaw_ser.write(yaw_angle);
-        delay(3);
-    }
+  //正向转动自检
+  for (pitch_angle = 90, yaw_angle = 90; pitch_angle < 180 && yaw_angle < 180; pitch_angle++, yaw_angle ++)
+  {
+    pitch_ser.write(pitch_angle);
+    yaw_ser.write(yaw_angle);
+    delay(5);
+  }
 
-    //伺服电机角度归位
-    pitch_ser.write(90);
-    yaw_ser.write(90);
+  //逆向转动自检
+  for (pitch_angle = 179, yaw_angle = 179; pitch_angle > 0  && yaw_angle > 0; pitch_angle--, yaw_angle --)
+  {
+    pitch_ser.write(pitch_angle);
+    yaw_ser.write(yaw_angle);
+    delay(5);
+  }
+  for (pitch_angle = 1, yaw_angle = 1; pitch_angle < 91  && yaw_angle < 91; pitch_angle++, yaw_angle ++)
+  {
+    pitch_ser.write(pitch_angle);
+    yaw_ser.write(yaw_angle);
+    delay(5);
+  }
+
+
+  //伺服电机角度归位
+  pitch_ser.write(90);
+  yaw_ser.write(90);
 
 
 
 
 }
 
+int sensor_pitch_a, sensor_pitch_b;
+int sensor_yaw_a, sensor_yaw_b;
+
+int pitch_angle = 90;
+int yaw_angle = 90;
+
+  //校准pitch轴和yaw轴光敏传感器的初始差值
+  const static int pitch_set = 0;
+  const static int yaw_set = -30;
+
+  //舵机转动角度控制向量
+  int pitch_motor_victor;
+  int yaw_motor_victor;
+  int step = 2;
 
 //程序标准执行过程
 void loop()
 {
 
-    int sensor_pitch_a,sensor_pitch_b;
-    int sensor_yaw_a,sensor_yaw_b;
 
-    int pitch_angle=90;
-    int yaw_angle=90;
-    
-    //伺服电机角度归位
+
+  //伺服电机角度归位
+  pitch_ser.write(pitch_angle);
+  yaw_ser.write(yaw_angle);
+
+  sensor_pitch_a = analogRead(A0);
+  sensor_pitch_b = analogRead(A1);
+  sensor_yaw_a = analogRead(A2);
+  sensor_yaw_b = analogRead(A3);
+
+
+  //数据滤波及标准化
+
+  //均值滤波
+  int i, j, k;
+  for (i = 0; i < 10; i++)
+  {
+    sensor_pitch_a  += analogRead(A0);
+    sensor_pitch_b  += analogRead(A1);
+    sensor_yaw_a    += analogRead(A2);
+    sensor_yaw_b    += analogRead(A3);
+    delay(5);
+  }
+  sensor_pitch_a  /= 10;
+  sensor_pitch_b  /= 10;
+  sensor_yaw_a    /= 10;
+  sensor_yaw_b    /= 10;
+
+
+
+  //光敏电阻传感器敏感度
+  int threshold = 50;
+
+
+  pitch_motor_victor = sensor_pitch_a - sensor_pitch_b + pitch_set;
+  yaw_motor_victor = sensor_yaw_a - sensor_yaw_b + yaw_set;
+
+
+  //pitch轴根据光敏信息控制舵机转动
+  if (pitch_motor_victor > threshold)
+  {
+    pitch_angle+=step;
     pitch_ser.write(pitch_angle);
+
+  }
+  else if (pitch_motor_victor < 0 - threshold)
+  {
+    pitch_angle-=step;
+    pitch_ser.write(pitch_angle);
+
+
+  }
+
+  //yaw轴根据光敏信息控制舵机转动
+  if (yaw_motor_victor > threshold)
+  {
+    yaw_angle+=step;
     yaw_ser.write(yaw_angle);
 
-    sensor_pitch_a = analogRead(A0);
-    sensor_pitch_b = analogRead(A1);
-    sensor_yaw_a = analogRead(A2);
-    sensor_yaw_b = analogRead(A3);
-    
-    
-    //数据滤波及标准化
 
-    //均值滤波
-    int i,j,k;
-    for(i=0;i<9;i++)
-    {
-        sensor_pitch_a  += analogRead(A0);
-        sensor_pitch_b  += analogRead(A1);
-        sensor_yaw_a    += analogRead(A2);
-        sensor_yaw_b    += analogRead(A3);
-        delay(5);
-    }
-    sensor_pitch_a  /= 10;
-    sensor_pitch_b  /= 10;
-    sensor_yaw_a    /= 10;
-    sensor_yaw_b    /= 10;
-
-    //校准pitch轴和yaw轴光敏传感器的初始差值
-    const static int pitch_set = 0;
-    const static int yaw_set = 0;
-    
-    //舵机转动角度控制向量
-    int pitch_motor_victor;
-    int yaw_motor_victor;
-
-    //光敏电阻传感器敏感度
-    int threshold=20;
+  }
+  else if (yaw_motor_victor < 0 - threshold)
+  {
+    yaw_angle-=step;
+    yaw_ser.write(yaw_angle);
 
 
-    pitch_motor_victor = sensor_pitch_a - sensor_pitch_b + pitch_set;
-    yaw_motor_victor = sensor_yaw_a - sensor_yaw_b + yaw_set;
-
-
-    //pitch轴根据光敏信息控制舵机转动
-    if(pitch_motor_victor > threshold)
-    {
-        pitch_angle++;
-        pitch_ser.write(pitch_angle);
-        delay(3);
-
-    }
-    else if(pitch_motor_victor < 0 - threshold)
-    {
-        pitch_angle--;
-        pitch_ser.write(pitch_angle);
-        delay(3);
-
-
-    }
-
-    //yaw轴根据光敏信息控制舵机转动
-    if(yaw_motor_victor > threshold)
-    {
-        yaw_angle++;
-        yaw_ser.write(yaw_angle);
-        delay(3);
-
-
-    }
-    else if(yaw_motor_victor < 0-threshold)
-    {
-        yaw_angle++;
-        yaw_ser.write(yaw_angle);
-        delay(3);
-
-
-    }
-
+  }
+  Serial.print("sensor_pitch_a:");
+  Serial.println(sensor_pitch_a);
+  Serial.print("sensor_pitch_b:");
+  Serial.println(sensor_pitch_b);
+  Serial.print("sensor_yaw_a:");
+  Serial.println(sensor_yaw_a);
+  Serial.print("sensor_yaw_b:");
+  Serial.println(sensor_yaw_b);
+  Serial.println("   ");
+  Serial.println("  ");
+//  delay(1000);
 
 
 
