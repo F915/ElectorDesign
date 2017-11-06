@@ -153,17 +153,25 @@ void loop()
   {
     if(sensor_yaw_a - sensor_yaw_b > threshold)
     {
-      pitch_ser.write(++pitch_angle);
-      yaw_ser.write(--yaw_angle);
+      pitch_angle += step;
+      yaw_angle -= step;
+      pitch_ser.write(pitch_angle);
+      yaw_ser.write(yaw_angle);
+      delay(speed);
     }
     else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
     {
-      pitch_ser.write(++pitch_angle);
-      yaw_ser.write(++yaw_angle);
+      pitch_angle += step;
+      yaw_angle += step;
+      pitch_ser.write(pitch_angle);
+      yaw_ser.write(yaw_angle);
+      delay(speed);
     }
     else
     {
-      pitch_ser.write(++pitch_angle);
+      pitch_angle += step;
+      pitch_ser.write(pitch_angle);
+      delay(speed);
     }
 
   }
@@ -173,17 +181,25 @@ void loop()
   {
     if(sensor_yaw_a - sensor_yaw_b > threshold)
     {
-      pitch_ser.write(--pitch_angle);
-      yaw_ser.write(++yaw_angle);
+      pitch_angle -= step;
+      yaw_angle += step;
+      pitch_ser.write(pitch_angle);
+      yaw_ser.write(yaw_angle);
+      delay(speed);
     }
     else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
     {
-      pitch_ser.write(--pitch_angle);
-      yaw_ser.write(--yaw_angle);
+      pitch_angle -= step;
+      yaw_angle -= step;
+      pitch_ser.write(pitch_angle);
+      yaw_ser.write(yaw_angle);
+      delay(speed);
     }
     else
     {
-      pitch_ser.write(--pitch_angle);
+      pitch_angle -= step;
+      pitch_ser.write(pitch_angle);
+      delay(speed);
     }
   }
   
@@ -192,11 +208,15 @@ void loop()
   {
     if(sensor_yaw_a - sensor_yaw_b > threshold)
     {
-      yaw_ser.write(++yaw_angle);
+      yaw_angle += step;
+      yaw_ser.write(yaw_angle);
+      delay(speed);
     }
     else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
     {
-      yaw_ser.write(--yaw_angle);
+      yaw_angle -= step;
+      yaw_ser.write(yaw_angle);
+      delay(speed);
     }
   }
   
