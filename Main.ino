@@ -167,6 +167,8 @@ void loop()
     }
 
   }
+
+
   else if(sensor_pitch_a - sensor_pitch_b < 0 - threshold)
   {
     if(sensor_yaw_a - sensor_yaw_b > threshold)
@@ -184,6 +186,8 @@ void loop()
       pitch_ser.write(--pitch_angle);
     }
   }
+  
+
   else
   {
     if(sensor_yaw_a - sensor_yaw_b > threshold)
@@ -196,6 +200,18 @@ void loop()
     }
   }
   
+
+  //舵机转动限位
+  if(pitch_angle > 175)
+    pitch_angle = 175;
+  else if(pitch_angle < 5)
+    pitch_angle = 5;
+
+  if(yaw_angle > 175)
+    yaw_angle = 175;
+  else if(yaw_angle < 5)
+    yaw_angle = 5;
+
   Serial.print("sensor_pitch_a:");
   Serial.println(sensor_pitch_a);
   Serial.print("sensor_pitch_b:");
