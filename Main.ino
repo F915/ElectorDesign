@@ -145,7 +145,7 @@ void loop()
   sensor_yaw_a    /= 10;
   sensor_yaw_b    /= 10;
 
-  const static int threshold = 0;
+  const static int threshold = 30;
   const static int step = 1;
   const static int speed = 2;
 
