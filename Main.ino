@@ -105,7 +105,7 @@ int yaw_angle = 90;
 
   //校准pitch轴和yaw轴光敏传感器的初始差值
   const static int pitch_set = 0;
-  const static int yaw_set = -30;
+  const static int yaw_set = 0;
 
   //舵机转动角度控制向量
   int pitch_motor_victor;
@@ -145,46 +145,57 @@ void loop()
   sensor_yaw_a    /= 10;
   sensor_yaw_b    /= 10;
 
+  const static int threshold = 0;
+  const static int step = 1;
+  const static int speed = 2;
 
-
-  //光敏电阻传感器敏感度
-  int threshold = 50;
-
-
-  pitch_motor_victor = sensor_pitch_a - sensor_pitch_b + pitch_set;
-  yaw_motor_victor = sensor_yaw_a - sensor_yaw_b + yaw_set;
-
-
-  //pitch轴根据光敏信息控制舵机转动
-  if (pitch_motor_victor > threshold)
+  if(sensor_pitch_a - sensor_pitch_b > threshold)
   {
-    pitch_angle+=step;
-    pitch_ser.write(pitch_angle);
+    if(sensor_yaw_a - sensor_yaw_b > threshold)
+    {
+      pitch_ser.write(++pitch_angle);
+      yaw_ser.write(--yaw_angle);
+    }
+    else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
+    {
+      pitch_ser.write(++pitch_angle);
+      yaw_ser.write(++yaw_angle);
+    }
+    else
+    {
+      pitch_ser.write(++pitch_angle);
+    }
 
   }
-  else if (pitch_motor_victor < 0 - threshold)
+  else if(sensor_pitch_a - sensor_pitch_b < 0 - threshold)
   {
-    pitch_angle-=step;
-    pitch_ser.write(pitch_angle);
-
-
+    if(sensor_yaw_a - sensor_yaw_b > threshold)
+    {
+      pitch_ser.write(--pitch_angle);
+      yaw_ser.write(++yaw_angle);
+    }
+    else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
+    {
+      pitch_ser.write(--pitch_angle);
+      yaw_ser.write(--yaw_angle);
+    }
+    else
+    {
+      pitch_ser.write(--pitch_angle);
+    }
   }
-
-  //yaw轴根据光敏信息控制舵机转动
-  if (yaw_motor_victor > threshold)
+  else
   {
-    yaw_angle+=step;
-    yaw_ser.write(yaw_angle);
-
-
+    if(sensor_yaw_a - sensor_yaw_b > threshold)
+    {
+      yaw_ser.write(++yaw_angle);
+    }
+    else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
+    {
+      yaw_ser.write(--yaw_angle);
+    }
   }
-  else if (yaw_motor_victor < 0 - threshold)
-  {
-    yaw_angle-=step;
-    yaw_ser.write(yaw_angle);
-
-
-  }
+  
   Serial.print("sensor_pitch_a:");
   Serial.println(sensor_pitch_a);
   Serial.print("sensor_pitch_b:");
@@ -195,10 +206,5 @@ void loop()
   Serial.println(sensor_yaw_b);
   Serial.println("   ");
   Serial.println("  ");
-//  delay(1000);
-
-
-
-
 
 }
