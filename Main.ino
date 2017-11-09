@@ -103,14 +103,13 @@ int sensor_yaw_a, sensor_yaw_b;
 int pitch_angle = 90;
 int yaw_angle = 90;
 
-  //校准pitch轴和yaw轴光敏传感器的初始差值
-  const static int pitch_set = 0;
-  const static int yaw_set = 0;
+//校准pitch轴和yaw轴光敏传感器的初始差值
+const static int pitch_set = 0;
+const static int yaw_set = 0;
 
-  //舵机转动角度控制向量
-  int pitch_motor_victor;
-  int yaw_motor_victor;
-  int step = 2;
+//舵机转动角度控制向量
+int pitch_motor_victor;
+int yaw_motor_victor;
 
 //程序标准执行过程
 void loop()
@@ -132,106 +131,101 @@ void loop()
 
   //均值滤波
   int i, j, k;
-  for (i = 0; i < 10; i++)
+  /*for (i = 0; i < 10; i++)
   {
     sensor_pitch_a  += analogRead(A0);
     sensor_pitch_b  += analogRead(A1);
     sensor_yaw_a    += analogRead(A2);
     sensor_yaw_b    += analogRead(A3);
-    delay(5);
   }
   sensor_pitch_a  /= 10;
   sensor_pitch_b  /= 10;
   sensor_yaw_a    /= 10;
   sensor_yaw_b    /= 10;
-
-  const static int threshold = 30;
+*/
+  const static int threshold = 20;
   const static int step = 1;
-  const static int speed = 2;
 
-  if(sensor_pitch_a - sensor_pitch_b > threshold)
+  if (sensor_pitch_a - sensor_pitch_b > threshold)
   {
-    if(sensor_yaw_a - sensor_yaw_b > threshold)
+    if (sensor_yaw_a - sensor_yaw_b > threshold)
     {
       pitch_angle += step;
       yaw_angle -= step;
       pitch_ser.write(pitch_angle);
       yaw_ser.write(yaw_angle);
-      delay(speed);
+
     }
-    else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
+    else if (sensor_yaw_a - sensor_yaw_b < 0 - threshold)
     {
       pitch_angle += step;
       yaw_angle += step;
       pitch_ser.write(pitch_angle);
       yaw_ser.write(yaw_angle);
-      delay(speed);
     }
     else
     {
       pitch_angle += step;
       pitch_ser.write(pitch_angle);
-      delay(speed);
     }
 
   }
 
 
-  else if(sensor_pitch_a - sensor_pitch_b < 0 - threshold)
+  else if (sensor_pitch_a - sensor_pitch_b < 0 - threshold)
   {
-    if(sensor_yaw_a - sensor_yaw_b > threshold)
+    if (sensor_yaw_a - sensor_yaw_b > threshold)
     {
       pitch_angle -= step;
       yaw_angle += step;
       pitch_ser.write(pitch_angle);
       yaw_ser.write(yaw_angle);
-      delay(speed);
     }
-    else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
+    else if (sensor_yaw_a - sensor_yaw_b < 0 - threshold)
     {
       pitch_angle -= step;
       yaw_angle -= step;
       pitch_ser.write(pitch_angle);
       yaw_ser.write(yaw_angle);
-      delay(speed);
     }
     else
     {
       pitch_angle -= step;
       pitch_ser.write(pitch_angle);
-      delay(speed);
     }
   }
-  
+
 
   else
   {
-    if(sensor_yaw_a - sensor_yaw_b > threshold)
+    if (sensor_yaw_a - sensor_yaw_b > threshold)
     {
       yaw_angle += step;
       yaw_ser.write(yaw_angle);
-      delay(speed);
     }
-    else if(sensor_yaw_a - sensor_yaw_b < 0 - threshold)
+    else if (sensor_yaw_a - sensor_yaw_b < 0 - threshold)
     {
-      yaw_angle -= step;
+      yaw_angle += step;
       yaw_ser.write(yaw_angle);
-      delay(speed);
     }
   }
-  
+
 
   //舵机转动限位
-  if(pitch_angle > 175)
-    pitch_angle = 175;
-  else if(pitch_angle < 5)
-    pitch_angle = 5;
 
-  if(yaw_angle > 175)
-    yaw_angle = 175;
-  else if(yaw_angle < 5)
-    yaw_angle = 5;
+  if (pitch_angle > 170)
+    pitch_angle = 170;
+  else if (pitch_angle < 10)
+    pitch_angle = 10;
 
+  if (yaw_angle > 170)
+    yaw_angle = 170;
+  else if (yaw_angle < 10)
+    yaw_angle = 10;
+
+
+  Serial.println("   ");
+  Serial.println("  ");
   Serial.print("sensor_pitch_a:");
   Serial.println(sensor_pitch_a);
   Serial.print("sensor_pitch_b:");
@@ -240,7 +234,13 @@ void loop()
   Serial.println(sensor_yaw_a);
   Serial.print("sensor_yaw_b:");
   Serial.println(sensor_yaw_b);
-  Serial.println("   ");
-  Serial.println("  ");
+  Serial.print("pitch_angle:");
+  Serial.println(pitch_angle);
+  Serial.print("yaw_angle:");
+  Serial.println(yaw_angle);
+  Serial.print("yaw_angle_sub:");
+  Serial.println(sensor_yaw_a - sensor_yaw_b);
+  Serial.print("pitch_angle_sub:");
+  Serial.println(sensor_pitch_a - sensor_pitch_b);
 
 }
