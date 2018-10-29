@@ -11,5 +11,3 @@ No more details.
 |   | A |   |
 | B |   | D |
 |   | C |   |
-
-- It's my first time to write Markdown "Readme". Supporting from [简书](http://www.jianshu.com/p/q81RER)
